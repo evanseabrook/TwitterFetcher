@@ -1,43 +1,51 @@
-package com.python.twitter.Options;
+package ca.evanseabrook.twitter.options;
 
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation;
+import org.apache.beam.sdk.options.ValueProvider;
 
 public interface TwitterFetcherOptions extends PipelineOptions {
 
     @Description("The handle of the Twitter user to pull Tweets for.")
     @Validation.Required
-    String getTwitterHandle();
-    void setTwitterHandle(String value);
+    ValueProvider<String> getTwitterHandle();
+
+    void setTwitterHandle(ValueProvider<String> value);
 
     @Description("The API key to use with the Twitter API.")
     @Validation.Required
-    String getApiKey();
-    void setApiKey(String value);
+    ValueProvider<String> getApiKey();
+
+    void setApiKey(ValueProvider<String> value);
 
     @Description("The API Secret to use with the Twitter API.")
     @Validation.Required
-    String getApiSecret();
-    void setApiSecret(String value);
+    ValueProvider<String> getApiSecret();
+
+    void setApiSecret(ValueProvider<String> value);
 
     @Description("The Access token to use with the Twitter API.")
     @Validation.Required
-    String getAccessToken();
-    void setAccessToken(String value);
+    ValueProvider<String> getAccessToken();
+
+    void setAccessToken(ValueProvider<String> value);
 
     @Description("The Access Token Secret to use with the Twitter API.")
     @Validation.Required
-    String getAccessTokenSecret();
-    void setAccessTokenSecret(String value);
+    ValueProvider<String> getAccessTokenSecret();
+
+    void setAccessTokenSecret(ValueProvider<String> value);
 
     @Description("The path to the staging directory used by BQ prior to loading the data.")
     @Validation.Required
-    String getTemporaryBQLocation();
-    void setTemporaryBQLocation(String value);
+    ValueProvider<String> getTemporaryBQLocation();
+
+    void setTemporaryBQLocation(ValueProvider<String> value);
 
     @Description("The fully qualified name of the table to be inserted into.")
     @Validation.Required
-    String getSinkBQTable();
-    void setSinkBQTable(String value);
+    ValueProvider<String> getSinkBQTable();
+
+    void setSinkBQTable(ValueProvider<String> value);
 }

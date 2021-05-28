@@ -1,10 +1,15 @@
-package com.python.twitter.model;
+package ca.evanseabrook.twitter.model;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Provides a serializable model for the Tweets that are being downloaded.
+ */
 public class TweetObject implements java.io.Serializable {
+    private static final long serialVersionUID = 4L;
+
     public String tweetId;
     public String tweetBody;
     public String authorId;
@@ -16,15 +21,15 @@ public class TweetObject implements java.io.Serializable {
     public String lang;
 
     public TweetObject(
-                @Nullable String tweetId,
-                @Nullable String tweetBody,
-                @Nullable String authorId,
-                int retweetCount,
-                int likeCount,
-                int replyCount,
-                int quoteCount,
-                @Nullable LocalDateTime createdAt,
-                @Nullable String lang
+            @Nullable String tweetId,
+            @Nullable String tweetBody,
+            @Nullable String authorId,
+            int retweetCount,
+            int likeCount,
+            int replyCount,
+            int quoteCount,
+            @Nullable LocalDateTime createdAt,
+            @Nullable String lang
     ) {
         this.tweetId = tweetId;
         this.tweetBody = tweetBody;

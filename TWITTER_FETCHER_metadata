@@ -1,0 +1,41 @@
+{
+  "description": "A pipeline that gathers recent Tweets for a given Twitter handle and stores it in BigQuery.",
+  "name": "Twitter Fetcher",
+  "parameters": [
+    {
+      "name": "apiKey",
+      "helpText": "The API key used to authenticate against the Twitter API.",
+      "label": "Twitter API Key"
+    },
+    {
+      "name": "apiSecret",
+      "helpText": "The API secret used to authenticate against the Twitter API.",
+      "label": "Twitter API Secret"
+    },
+    {
+      "name": "accessToken",
+      "helpText": "The access token used to authenticate against the Twitter API.",
+      "label": "Twitter Access Token"
+    },
+    {
+      "name": "accessTokenSecret",
+      "helpText": "The token secret used to authenticate against the Twitter API.",
+      "label": "Twitter Access Token Secret"
+    },
+    {
+      "name": "twitterHandle",
+      "helpText": "The Twitter handle to download Tweets for (e.g. pythian).",
+      "label": "Twitter Handle"
+    },
+    {
+      "name": "temporaryBQLocation",
+      "helpText": "The GCS location in which to stage data to load into BQ (e.g. gs://your-bucket/temp).",
+      "label": "Temporary BQ Location"
+    },
+    {
+      "name": "sinkBQTable",
+      "helpText": "The fully qualified BigQuery table name to insert into (e.g. project.dataset.table).",
+      "label": "BigQuery Sink"
+    }
+  ]
+}

@@ -1,14 +1,11 @@
-package com.python.twitter.IO;
+package ca.evanseabrook.twitter.io;
 
 import com.github.redouane59.twitter.TwitterClient;
 import com.github.redouane59.twitter.dto.tweet.*;
-import com.github.redouane59.twitter.dto.user.User;
 import com.github.redouane59.twitter.signature.TwitterCredentials;
-import com.google.auto.value.AutoValue;
-import com.python.twitter.model.TweetObject;
+import ca.evanseabrook.twitter.model.TweetObject;
 import org.apache.beam.sdk.coders.*;
 import org.apache.beam.sdk.options.ValueProvider;
-import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.PTransform;
@@ -19,14 +16,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
+/**
+ * TwitterReader is an I/O connector that fetches the last 7 days worth of Tweets for a given Twitter handle.
+ */
 public class TwitterReader {
-    public static ListTweets read(String apiKey, String apiSecretKey, String accessToken, String accessTokenSecret, String twitterUser) {
+    public static ListTweets read(ValueProvider<String> apiKey,
+                                  ValueProvider<String> apiSecretKey,
+                                  ValueProvider<String> accessToken,
+                                  ValueProvider<String> accessTokenSecret,
+                                  ValueProvider<String> twitterUser) {
         return new ListTweets(
-                ValueProvider.StaticValueProvider.of(twitterUser),
+                twitterUser,
                 apiKey,
                 apiSecretKey,
                 accessToken,
@@ -38,16 +42,16 @@ public class TwitterReader {
     public static class ListTweets extends PTransform<PBegin, PCollection<TweetObject>> {
 
         private final ValueProvider<String> twitterHandle;
-        private final String apiKey;
-        private final String apiSecretKey;
-        private final String accessToken;
-        private final String accessTokenSecret;
+        private final ValueProvider<String> apiKey;
+        private final ValueProvider<String> apiSecretKey;
+        private final ValueProvider<String> accessToken;
+        private final ValueProvider<String> accessTokenSecret;
 
         ListTweets(ValueProvider<String> twitterHandle,
-                   String apiKey,
-                   String apiSecretKey,
-                   String accessToken,
-                   String accessTokenSecret
+                   ValueProvider<String> apiKey,
+                   ValueProvider<String> apiSecretKey,
+                   ValueProvider<String> accessToken,
+                   ValueProvider<String> accessTokenSecret
         ) {
             this.twitterHandle = twitterHandle;
             this.apiKey = apiKey;
@@ -68,18 +72,18 @@ public class TwitterReader {
 
         private transient TwitterClient client;
 
-        private String apiKey;
-        private String apiSecretKey;
-        private String accessToken;
-        private String accessTokenSecret;
+        private ValueProvider<String> apiKey;
+        private ValueProvider<String> apiSecretKey;
+        private ValueProvider<String> accessToken;
+        private ValueProvider<String> accessTokenSecret;
 
-        private final Logger logger = LogManager.getLogger(ListTweetsFn.class);
+        private final Logger logger = LoggerFactory.getLogger(ListTweetsFn.class);
 
         ListTweetsFn(
-                String apiKey,
-                String apiSecretKey,
-                String accessToken,
-                String accessTokenSecret
+                ValueProvider<String> apiKey,
+                ValueProvider<String> apiSecretKey,
+                ValueProvider<String> accessToken,
+                ValueProvider<String> accessTokenSecret
         ) {
             this.apiKey = apiKey;
             this.apiSecretKey = apiSecretKey;
@@ -87,31 +91,36 @@ public class TwitterReader {
             this.accessTokenSecret = accessTokenSecret;
         }
 
+
         @Setup
         public void initClient() {
 
-            logger.info("About to connect to the Twitter API!");
-            logger.info(String.format("API Key: %s\nAPI secret key: %s\nAccessToken: %s\nAccess Token secret: %s", this.apiKey, this.apiSecretKey, this.accessToken, this.accessTokenSecret));
-
             TwitterCredentials creds = TwitterCredentials.builder()
-                    .apiKey(this.apiKey)
-                    .apiSecretKey(this.apiSecretKey)
-                    .accessToken(this.accessToken)
-                    .accessTokenSecret(this.accessTokenSecret)
+                    .apiKey(this.apiKey.get())
+                    .apiSecretKey(this.apiSecretKey.get())
+                    .accessToken(this.accessToken.get())
+                    .accessTokenSecret(this.accessTokenSecret.get())
                     .build();
 
             this.client = new TwitterClient(creds);
         }
 
+        /**
+         * Fetches Tweets for the last 7 days for the given twitterHandle
+         * @param twitterHandle The handle of the user you wish to download Tweets for.
+         * @param outputReceiver The output receiver that we emit our results to.
+         */
         @ProcessElement
         public void listTweets(
                 @Element String twitterHandle,
                 OutputReceiver<TweetObject> outputReceiver
         ) {
+
+
             List<Tweet> tweets = this.client.searchForTweetsWithin7days(String.format("from:%s", twitterHandle));
 
-            for (Tweet t : tweets ) {
-                logger.info(String.format("Received tweet: %s", t.getText()));
+            for (Tweet t : tweets) {
+                logger.debug(String.format("Received tweet: %s", t.getText()));
                 outputReceiver.output(new TweetObject(
                         t.getId(),
                         new String(t.getText().getBytes(), StandardCharsets.UTF_8),
