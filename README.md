@@ -3,7 +3,7 @@
 This is a sample project to show how you could interact with the Twitter API using Apache Beam. This pipeline will download Tweets
 present in the last 7 days for a given Twitter handle and store the results into a BigQuery table.
 
-For more information, please visit my blog post on [Pythian's Official Blog](https://blog.pythian.com/technical-track/).
+For more information, please visit my blog post on [Pythian's Official Blog](https://blog.pythian.com/consuming-tweets-using-apache-beam-on-dataflow/).
 
 
 ## Getting Started
